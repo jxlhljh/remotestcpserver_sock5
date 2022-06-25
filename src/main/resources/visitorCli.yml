@@ -1,0 +1,37 @@
+#token校验码，服务端与controlClient端及visitor需要配置成一致
+token: 123456
+#是否需要采用ssl加密传输数据，服务端与controlClient端及visitor需要配置成一致
+ssl: false
+
+#trunnel config
+#隧道配置，即服务端的IP和端口
+trunnelHost: 127.0.0.1
+trunnelPort: 7000
+
+#if you connect the server need proxy ,config is here
+##############配置controlClient端是否需要通过http代理或sock5代理连接服务端，默认false##############
+#needProxy: false
+#配置代理类型，http或socks，表示http代理或sock5代理, 默认http代理,仅当needProxy为true有效
+#proxyType: http
+#代理服务器IP
+#proxyHost: 127.0.0.1
+#代理服务器端口
+#proxyPort: 1080
+#代理服务器认证账号
+#proxyUsername: sendi
+#代理服务器认证密码
+#proxyPassword: sendi123
+
+##############visitorCli透传详细配置##############
+##visitorCli透传详细配置，支持数组，配置一个或多个，
+##注意配置需要与controlClient端成对出现，即controlClient端配了一个group，visitorCli也应该有一个对应的配置
+configs:
+    #分组名称，数组内需要唯一不能相同。
+  - group: tcptest
+    #visitorCli对外提供服务的端口后，透传后最终通过此端口提供给用户进行访问
+    frontPort: 13306
+    
+    #分组名称，数组内需要唯一不能相同
+  - group: socktest
+    #visitorCli对外提供服务的端口后，透传后最终通过此端口提供给用户进行访问
+    frontPort: 1080

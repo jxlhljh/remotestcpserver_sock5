@@ -6,18 +6,17 @@ import java.util.Map;
 import cn.gzsendi.stcp.utils.FlowCounter;
 import cn.gzsendi.stcp.utils.MessageUtils;
 import cn.gzsendi.system.exception.GzsendiException;
-
-import com.alibaba.fastjson.JSONObject;
+import cn.gzsendi.system.utils.JsonUtil;
 
 public class VisitorCliHandler {
 	
 	private int bufferSize = 8092;
 	private ControlCliHandler controlCliHandler;
 	private ClientSocketThread clientSocketThread;
-	private JSONObject headStr;
+	private Map<String,Object> headStr;
 	private final static String characterSet = "UTF-8";
 	
-	public VisitorCliHandler(ClientSocketThread clientSocketThread,JSONObject headStr) {
+	public VisitorCliHandler(ClientSocketThread clientSocketThread,Map<String,Object> headStr) {
 		this.clientSocketThread = clientSocketThread;
 		this.headStr = headStr;
 	}
@@ -25,7 +24,7 @@ public class VisitorCliHandler {
 	public void handler() throws Exception{
 		
 		Map<String,VisitorCliHandler> visitorHandlers = clientSocketThread.getStcpServer().getVisitorHandlers();
-		String globalTraceId = headStr.getString("globalTraceId"); 
+		String globalTraceId = JsonUtil.getString(headStr, "globalTraceId"); 
 		visitorHandlers.put(globalTraceId, this); //放入映射表
 
 		try {

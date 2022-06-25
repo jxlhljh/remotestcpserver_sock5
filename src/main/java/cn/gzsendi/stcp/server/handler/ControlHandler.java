@@ -13,8 +13,6 @@ import cn.gzsendi.stcp.utils.MessageUtils;
 import cn.gzsendi.system.exception.GzsendiException;
 import cn.gzsendi.system.utils.JsonUtil;
 
-import com.alibaba.fastjson.JSONObject;
-
 
 public class ControlHandler {
 	
@@ -44,8 +42,8 @@ public class ControlHandler {
 			
 			while(true){
 				
-				JSONObject dataStr = readDataStr(clientSocketThread.getDin());
-				String msgType = dataStr.getString("msgType");//消息类型，controlConnect,controlHeart,visitorConnect,visitorHeart,dataBindReq
+				Map<String,Object> dataStr = readDataStr(clientSocketThread.getDin());
+				String msgType = JsonUtil.getString(dataStr, "msgType");//消息类型，controlConnect,controlHeart,visitorConnect,visitorHeart,dataBindReq
 				
 				//心跳回应
 				if("controlHeart".equals(msgType)) {
@@ -77,7 +75,7 @@ public class ControlHandler {
 	}
 	
 	//读取socket消息头 , 0x070x07+字符串长度+Json字符串
-	private JSONObject readDataStr(DataInputStream dis) throws IOException{
+	private Map<String,Object> readDataStr(DataInputStream dis) throws IOException{
 		
 		byte firstByte = dis.readByte();
 		byte secondByte = dis.readByte();
@@ -97,7 +95,7 @@ public class ControlHandler {
 		//记录流经StcpServer的流量
 		FlowCounter.addReceivedSize(2 + resultlength);
 		
-		return JsonUtil.fromJson(headStr);
+		return JsonUtil.castToObject(headStr);
 	}
 
 }

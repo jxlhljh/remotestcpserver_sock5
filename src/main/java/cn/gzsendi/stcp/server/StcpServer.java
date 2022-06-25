@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.gzsendi.stcp.server.handler.ClientSocketThread;
+import cn.gzsendi.stcp.server.handler.ControlCliHandler;
 import cn.gzsendi.stcp.server.handler.VisitorCliHandler;
 import cn.gzsendi.stcp.utils.FlowCounter;
 
@@ -38,7 +39,16 @@ public class StcpServer {
 	private int soTimeOut = 300000;//5分钟超时
 	private Map<String,ClientSocketThread> groupNames = new ConcurrentHashMap<String,ClientSocketThread>();
 	private Map<String,VisitorCliHandler> visitorHandlers = new ConcurrentHashMap<String,VisitorCliHandler>();
+	private Map<String,ControlCliHandler> controlCliHandlers = new ConcurrentHashMap<String,ControlCliHandler>();
 	
+	public Map<String, ControlCliHandler> getControlCliHandlers() {
+		return controlCliHandlers;
+	}
+
+	public void setControlCliHandlers(Map<String, ControlCliHandler> controlCliHandlers) {
+		this.controlCliHandlers = controlCliHandlers;
+	}
+
 	public Map<String, VisitorCliHandler> getVisitorHandlers() {
 		return visitorHandlers;
 	}
@@ -57,7 +67,6 @@ public class StcpServer {
 		
 		//启动检查线程
 		StcpServerCheckCheck check = new StcpServerCheckCheck();
-		check.setDaemon(true);
 		check.start();
 		
 		ServerSocket serverSocket = null;
@@ -113,23 +122,43 @@ public class StcpServer {
 			while(true) {
 				
 				try {
+					
 					Thread.sleep(30000l);
-				} catch (InterruptedException e) {
-					logger.error("",e);
+					
+					logger.info("start print check info ...");
+					logger.info("groupNames.size ->>>> {}", groupNames.size());
+					logger.info("visitorHandlers.size ->>>> {}", visitorHandlers.size());
+					logger.info("controlCliHandlers.size ->>>> {}", controlCliHandlers.size());
+					
+					if(groupNames.size()>0) {
+						logger.info("groupNames ->>>>");
+						for(ClientSocketThread clientSocketThread : groupNames.values()) {
+							logger.info("groupName: " + clientSocketThread.getGroupName() + " id:" + clientSocketThread.hashCode() + " ->>>> ");
+						}
+					}
+					
+					if(visitorHandlers.size()>0) {
+						logger.info("visitorHandlers ->>>>");
+						for(String globalTraceId : visitorHandlers.keySet()) {
+							logger.info("groupName: " + visitorHandlers.get(globalTraceId).getClientSocketThread().getGroupName() + " globalTraceId: " + globalTraceId+ " ->>>> ");
+						}
+					}
+					
+					
+					if(controlCliHandlers.size()>0) {
+						logger.info("controlCliHandlers ->>>>");
+						for(String globalTraceId : controlCliHandlers.keySet()) {
+							logger.info("groupName: " + controlCliHandlers.get(globalTraceId).getClientSocketThread().getGroupName() + " globalTraceId: " + globalTraceId+ " ->>>> ");
+						}
+					}
+					
+					logger.info("Stcpserver total transfer flow size ->>>> {}", formatSize(FlowCounter.totalReceivedSize));
+					logger.info("");
+					
+					
+				} catch (Exception e) {
+					logger.error("StcpServerCheckCheck occur error",e);
 				}
-				
-				logger.info("groupNames.size ->>>> {}", groupNames.size());
-				for(ClientSocketThread clientSocketThread : groupNames.values()) {
-					logger.info("groupName: " + clientSocketThread.getGroupName() + " id:" + clientSocketThread.hashCode() +  " ->>>> ");
-				}
-				
-				logger.info("visitorHandlers.size ->>>> {}", visitorHandlers.size());
-				for(String globalTraceId : visitorHandlers.keySet()) {
-					logger.info("groupName: " + visitorHandlers.get(globalTraceId).getClientSocketThread().getGroupName() + " globalTraceId: " + globalTraceId+ " ->>>> ");
-				}
-				
-				logger.info("Stcpserver total transfer flow size ->>>> {}", formatSize(FlowCounter.totalReceivedSize));
-				logger.info("");
 				
 			}
 			

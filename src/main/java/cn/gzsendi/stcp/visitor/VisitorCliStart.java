@@ -3,20 +3,22 @@ package cn.gzsendi.stcp.visitor;
 import java.util.Arrays;
 import java.util.List;
 
+import cn.gzsendi.stcp.config.VisitorCliConfig;
+
 public class VisitorCliStart {
 
-	public static String token = "123456";
-	public static String trunnelHost = "127.0.0.1";
-	public static int trunnelPort = 7000;
-	public static List<String> groups = Arrays.asList("stcp1");
-	public static List<String> frontPorts = Arrays.asList("8899");
-	public static boolean ssl = true;
-	public static boolean needProxy = false;
-	public static String proxyType = "socks";
-	public static String proxyHost = "127.0.0.1";
-	public static int proxyPort = 1080;
-	public static String proxyUsername = "sendi";
-	public static String proxyPassword = "sendi123";
+	public static String token = VisitorCliConfig.token;
+	public static String trunnelHost = VisitorCliConfig.trunnelHost;
+	public static int trunnelPort = VisitorCliConfig.trunnelPort;
+	public static List<String> groups = VisitorCliConfig.groups;
+	public static List<String> frontPorts = VisitorCliConfig.frontPorts;
+	public static boolean ssl = VisitorCliConfig.ssl;
+	public static boolean needProxy = VisitorCliConfig.needProxy;
+	public static String proxyType = VisitorCliConfig.proxyType;
+	public static String proxyHost = VisitorCliConfig.proxyHost;
+	public static int proxyPort = VisitorCliConfig.proxyPort;
+	public static String proxyUsername = VisitorCliConfig.proxyUsername;
+	public static String proxyPassword = VisitorCliConfig.proxyPassword;
 
 	public static void main(String[] args) {
 

@@ -11,6 +11,7 @@ import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.Socket;
 import java.security.KeyStore;
+import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -25,8 +26,6 @@ import cn.gzsendi.stcp.utils.MessageUtils;
 import cn.gzsendi.stcp.utils.SocketFactory;
 import cn.gzsendi.system.exception.GzsendiException;
 import cn.gzsendi.system.utils.JsonUtil;
-
-import com.alibaba.fastjson.JSONObject;
 
 public class VisitorCli extends Thread{
 	private final static String characterSet = "UTF-8";
@@ -143,8 +142,8 @@ public class VisitorCli extends Thread{
 			dout.write(headStr.getBytes(characterSet));
 			
 			//获取绑定成功返回包
-			JSONObject returnPackageStr = readDataStr(din);
-			String msgType = returnPackageStr.getString("msgType");//消息类型，controlConnect
+			Map<String,Object> returnPackageStr = readDataStr(din);
+			String msgType = JsonUtil.getString(returnPackageStr, "msgType");//消息类型，controlConnect
 			if("visitorCliConnectResp".equals(msgType)){
 				
 				//成功后设置绑定成功
@@ -210,7 +209,7 @@ public class VisitorCli extends Thread{
 	}
 	
 	//读取socket消息头 , 0x070x07+字符串长度+Json字符串
-	private JSONObject readDataStr(DataInputStream dis) throws IOException{
+	private Map<String,Object> readDataStr(DataInputStream dis) throws IOException{
 		
 		byte firstByte = dis.readByte();
 		byte secondByte = dis.readByte();
@@ -226,7 +225,7 @@ public class VisitorCli extends Thread{
 			totalReadedSize += readedSize;
 		}
 		String headStr = new String(datas,characterSet);
-		return JsonUtil.fromJson(headStr);
+		return JsonUtil.castToObject(headStr);
 	}
 
 }

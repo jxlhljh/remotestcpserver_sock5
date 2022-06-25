@@ -5,27 +5,31 @@ import java.util.Map;
 
 import cn.gzsendi.stcp.utils.FlowCounter;
 import cn.gzsendi.system.exception.GzsendiException;
-
-import com.alibaba.fastjson.JSONObject;
+import cn.gzsendi.system.utils.JsonUtil;
 
 public class ControlCliHandler {
 	
 	private int bufferSize = 8092;
 	private VisitorCliHandler visitorCliHandler;
 	private ClientSocketThread clientSocketThread;
-	private JSONObject headStr;
+	private Map<String,Object> headStr;
 	
-	public ControlCliHandler(ClientSocketThread clientSocketThread,JSONObject headStr){
+	public ControlCliHandler(ClientSocketThread clientSocketThread,Map<String,Object> headStr){
 		this.clientSocketThread = clientSocketThread;
 		this.headStr = headStr;
 	}
 	
 	public void handler() throws Exception{
-
+		
+		Map<String, ControlCliHandler> controlCliHandlers = clientSocketThread.getStcpServer().getControlCliHandlers();
+		String globalTraceId = JsonUtil.getString(headStr, "globalTraceId");
+		
 		try {
 			
+			//放入内存
+			controlCliHandlers.put(globalTraceId, this);
+			
 			Map<String,VisitorCliHandler> visitorHandlers = clientSocketThread.getStcpServer().getVisitorHandlers();
-			String globalTraceId = headStr.getString("globalTraceId"); 
 			VisitorCliHandler visitorCliHandler = visitorHandlers.get(globalTraceId);
 			
 			//visitorCliHandler没有连接
@@ -74,6 +78,8 @@ public class ControlCliHandler {
 				visitorCliHandler.getClientSocketThread().close();
 				
 			}
+			
+			controlCliHandlers.remove(globalTraceId);//移除映射表
 			
 		}
 		
